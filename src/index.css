@@ -1,0 +1,29 @@
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&family=Inter:wght@300;400;500;600&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-serif: "Cormorant Garamond", serif;
+  --font-sans: "Inter", sans-serif;
+  --color-primary: #0284c7; /* Fresh Sky Blue */
+  --color-secondary: #f0f9ff; /* Very Light Blue tint */
+  --color-accent: #0ea5e9; /* Sky Blue */
+  --color-sunny: #facc15; /* Morning Yellow */
+}
+
+@layer base {
+  body {
+    @apply font-sans bg-white text-slate-900;
+  }
+  h1, h2, h3, h4 {
+    @apply font-serif;
+  }
+}
+
+.pill-image {
+  @apply rounded-[9999px] aspect-[3/4] object-cover;
+}
+
+.card-rounded {
+  @apply rounded-[32px] bg-white shadow-sm border border-stone-100;
+}
+
