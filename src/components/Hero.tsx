@@ -48,19 +48,7 @@ export default function Hero() {
         </div>
       </div>
 
-      <motion.div 
-        initial={{ opacity: 0, scale: 0.8 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 1.2, delay: 0.2 }}
-        className="absolute right-[-10%] top-[20%] hidden xl:block w-[600px] h-[800px]"
-      >
-        <img 
-          src="https://images.unsplash.com/photo-1528498033373-3c6c08e93d79?auto=format&fit=crop&q=80&w=800" 
-          alt="Dairy Farm" 
-          className="pill-image w-full h-full shadow-2xl"
-          referrerPolicy="no-referrer"
-        />
-      </motion.div>
+      
     </section>
   );
 }

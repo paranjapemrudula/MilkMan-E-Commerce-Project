@@ -103,9 +103,8 @@ export default function CartDrawer({ isOpen, onClose, items, onUpdateQuantity, o
                     <motion.div 
                       layout
                       key={item.id} 
-                      className="flex gap-4 p-4 rounded-2xl bg-slate-50 border border-slate-100 hover:border-primary/20 transition-all"
+                      className="p-4 rounded-2xl bg-slate-50 border border-slate-100 hover:border-primary/20 transition-all"
                     >
-                      <img src={item.image} alt={item.name} className="w-20 h-20 rounded-xl object-cover shadow-sm" />
                       <div className="flex-1">
                         <div className="flex justify-between mb-1">
                           <h4 className="font-medium text-slate-900">{item.name}</h4>
