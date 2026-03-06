@@ -1,20 +1,47 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
-</div>
+MilkMan Pro – Dairy Products E-Commerce Platform
 
-# Run and deploy your AI Studio app
+MilkMan is a full-stack e-commerce web application for dairy products where users can browse categories, add products to cart, subscribe to milk plans, and place orders with multiple payment options.The platform is built using React (Frontend) and Django (Backend).
 
-This contains everything you need to run your app locally.
+Objective
+The objective of this project is to create an online platform for dairy product purchasing and subscription services.
+Users can:
+Browse dairy product categories
+View and purchase products
+Add items to cart
+Complete checkout with UPI or Cash on Delivery
+Subscribe to regular milk delivery plans
+View order history and payment status in profile
 
-View your app in AI Studio: https://ai.studio/apps/4b7d4490-58bd-40d6-a674-ded928222c1f
+Tech Stack
+     Frontend
+             React.js
+             JavaScript
+             CSS
+     Backend
+             Django
+             Django REST Framework
+     Database
+              SQLite
+      Tools
+              VS Code
+              Git & GitHub
 
-## Run Locally
+Sequnce Diagram
+<img width="711" height="1027" alt="MilkMan Sequence Diagram" src="https://github.com/user-attachments/assets/99882092-48d0-4763-9950-2b971213a13e" />
 
-**Prerequisites:**  Node.js
+How to Run the Project
+1️⃣ Clone Repository
+git clone https://github.com/paranjapemrudula/MilkMan-E-Commerce-Project
+2️⃣ Backend Setup
+cd backend
+python -m venv venv
+venv\Scripts\activate
+pip install -r requirements.txt
+python manage.py migrate
+python manage.py runserver
+3️⃣Frontend Setup
+npm install
+npm run dev 
 
 
-1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+
