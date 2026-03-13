@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { X, Package, Calendar, ChevronRight } from "lucide-react";
 import { User, Order } from "../types";
+import { apiUrl } from "../lib/api";
 
 interface ProfileModalProps {
   isOpen: boolean;
@@ -24,7 +25,7 @@ export default function ProfileModal({ isOpen, onClose, user, onViewCart, cartIt
   const fetchOrders = async () => {
     setLoading(true);
     try {
-      const res = await fetch(`/api/orders/${user?.id}`);
+      const res = await fetch(apiUrl(`/api/orders/${user?.id}/`));
       if (res.ok) {
         setOrders(await res.json());
       }

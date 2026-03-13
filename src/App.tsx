@@ -51,15 +51,15 @@ function MainApp() {
     setLoading(true);
     try {
       const fetchCategories = async () => {
-        const res = await fetch(apiUrl("/api/categories"));
+        const res = await fetch(apiUrl("/api/categories/"));
         if (res.ok) setCategories(await res.json());
       };
       const fetchProducts = async () => {
-        const res = await fetch(apiUrl("/api/products"));
+        const res = await fetch(apiUrl("/api/products/"));
         if (res.ok) setProducts(await res.json());
       };
       const fetchSubscriptions = async () => {
-        const res = await fetch(apiUrl("/api/subscriptions"));
+        const res = await fetch(apiUrl("/api/subscriptions/"));
         if (res.ok) setSubscriptions(await res.json());
       };
 
@@ -116,7 +116,7 @@ function MainApp() {
 
     try {
       // Create pending order
-      const res = await fetch(apiUrl("/api/orders"), {
+      const res = await fetch(apiUrl("/api/orders/"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -147,7 +147,7 @@ function MainApp() {
     }
     try {
       // Create pending subscription order
-      const res = await fetch(apiUrl("/api/subscriptions/purchase"), {
+      const res = await fetch(apiUrl("/api/subscriptions/purchase/"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ user_id: user.id, subscription_id: sub.id }),

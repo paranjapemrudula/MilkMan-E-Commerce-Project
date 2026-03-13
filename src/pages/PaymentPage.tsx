@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import { apiUrl } from "../lib/api";
 
 export default function PaymentPage() {
   const { orderId } = useParams<{ orderId: string }>();
@@ -17,7 +18,7 @@ export default function PaymentPage() {
       setLoading(true);
       setError("");
       try {
-        const intent = await fetch("/api/payments/intent", {
+        const intent = await fetch(apiUrl("/api/payments/intent/"), {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ order_id: Number(orderId) })
@@ -47,7 +48,7 @@ export default function PaymentPage() {
     }
     setError("");
     try {
-      const res = await fetch("/api/payments/confirm", {
+      const res = await fetch(apiUrl("/api/payments/confirm/"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -128,4 +129,3 @@ export default function PaymentPage() {
     </div>
   );
 }
-
