@@ -3,8 +3,22 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate
+from django.core.validators import validate_email
+from django.core.exceptions import ValidationError
 from .models import Category, Product, Subscription, Order, OrderItem, Payment
 from .serializers import CategorySerializer, ProductSerializer, SubscriptionSerializer, OrderSerializer, UserSerializer
+
+
+def normalize_and_validate_email(raw_email):
+    email = (raw_email or '').strip().lower()
+    if not email:
+        raise ValidationError('Email is required')
+
+    validate_email(email)
+    local_part, _, domain = email.partition('@')
+    if not local_part or '.' not in domain:
+        raise ValidationError('Enter a valid email address')
+    return email
 
 class CategoryViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Category.objects.all()
@@ -20,24 +34,35 @@ class SubscriptionViewSet(viewsets.ReadOnlyModelViewSet):
 
 @api_view(['POST'])
 def signup(request):
-    username = request.data.get('email')
-    email = request.data.get('email')
+    raw_email = request.data.get('email')
     password = request.data.get('password')
-    
-    if not email or not password:
+
+    if not raw_email or not password:
         return Response({'error': 'Email and password are required'}, status=status.HTTP_400_BAD_REQUEST)
-    
+
+    try:
+        email = normalize_and_validate_email(raw_email)
+    except ValidationError as exc:
+        return Response({'error': exc.message}, status=status.HTTP_400_BAD_REQUEST)
+
+    username = email
+
     if User.objects.filter(username=username).exists():
         return Response({'error': 'User already exists'}, status=status.HTTP_400_BAD_REQUEST)
-    
+
     user = User.objects.create_user(username=username, email=email, password=password)
     return Response({'id': user.id, 'email': user.email, 'role': 'customer'})
 
 @api_view(['POST'])
 def login(request):
-    username = request.data.get('email')
+    raw_email = request.data.get('email')
     password = request.data.get('password')
-    
+
+    try:
+        username = normalize_and_validate_email(raw_email)
+    except ValidationError as exc:
+        return Response({'error': exc.message}, status=status.HTTP_400_BAD_REQUEST)
+
     user = authenticate(username=username, password=password)
     if user:
         return Response({'id': user.id, 'email': user.email, 'role': 'customer'})

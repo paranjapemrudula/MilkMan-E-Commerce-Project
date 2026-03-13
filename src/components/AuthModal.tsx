@@ -17,9 +17,17 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
+  const isValidEmail = (value: string) =>
+    /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(value.trim());
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
+    const normalizedEmail = email.trim().toLowerCase();
+    if (!isValidEmail(normalizedEmail)) {
+      setError("Enter a valid email address.");
+      return;
+    }
     setLoading(true);
     const endpoint = isLogin ? apiUrl("/api/auth/login/") : apiUrl("/api/auth/signup/");
     
@@ -28,7 +36,7 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ 
-          email: email.trim().toLowerCase(), 
+          email: normalizedEmail, 
           password: password.trim() 
         }),
       });
@@ -85,6 +93,7 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
                 <input 
                   type="email" 
                   required
+                  pattern="^[^\s@]+@[^\s@]+\.[^\s@]{2,}$"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   className="w-full px-4 py-3 rounded-2xl border border-slate-200 focus:border-primary outline-none transition-all"
