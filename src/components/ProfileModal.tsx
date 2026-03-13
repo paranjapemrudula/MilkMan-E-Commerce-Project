@@ -15,6 +15,7 @@ interface ProfileModalProps {
 export default function ProfileModal({ isOpen, onClose, user, onViewCart, cartItemCount }: ProfileModalProps) {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(false);
+  const [brokenImages, setBrokenImages] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
     if (isOpen && user) {
@@ -116,7 +117,23 @@ export default function ProfileModal({ isOpen, onClose, user, onViewCart, cartIt
                       <div className="space-y-2">
                         {order.items.map((item) => (
                           <div key={item.id} className="flex items-center gap-3 text-sm">
-                            <img src={item.image} alt={item.name} className="w-8 h-8 rounded-lg object-cover" />
+                            {item.image && !brokenImages[`${order.id}-${item.id}`] ? (
+                              <img
+                                src={item.image}
+                                alt={item.name}
+                                className="w-8 h-8 rounded-lg object-cover"
+                                onError={() =>
+                                  setBrokenImages((prev) => ({
+                                    ...prev,
+                                    [`${order.id}-${item.id}`]: true,
+                                  }))
+                                }
+                              />
+                            ) : (
+                              <div className="w-8 h-8 rounded-lg bg-slate-100 text-slate-500 flex items-center justify-center text-[10px] font-semibold">
+                                {(item.name || "Item").slice(0, 2).toUpperCase()}
+                              </div>
+                            )}
                             <span className="flex-1 text-slate-700">{item.name}</span>
                             <span className="text-slate-400">x{item.quantity}</span>
                             <span className="font-medium text-slate-900">₹{item.price * item.quantity}</span>

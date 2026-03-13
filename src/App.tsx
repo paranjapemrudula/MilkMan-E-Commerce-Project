@@ -153,7 +153,8 @@ function MainApp() {
         body: JSON.stringify({ user_id: user.id, subscription_id: sub.id }),
       });
       if (!res.ok) {
-        alert("Failed to purchase subscription. Please try again.");
+        const data = await res.json().catch(() => ({}));
+        alert(data.error || "Failed to purchase subscription. Please try again.");
         return;
       }
       const order = await res.json(); // { id, total_amount }

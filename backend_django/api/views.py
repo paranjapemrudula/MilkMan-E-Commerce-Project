@@ -76,10 +76,22 @@ def purchase_subscription(request):
 
         product_name = f"Subscription: {subscription.name} - {subscription.category}"
         product_description = f"Plan for {subscription.duration_days} days @ Rs.{subscription.price_per_liter}/L"
+        active_statuses = ['pending', 'paid', Payment.STATUS_COD]
+
+        existing_subscription = OrderItem.objects.filter(
+            order__user=user,
+            order__status__in=active_statuses,
+            product__name=product_name,
+        ).exists()
+        if existing_subscription:
+            return Response(
+                {'error': 'This subscription is already active for your account.'},
+                status=status.HTTP_409_CONFLICT,
+            )
 
         category, _ = Category.objects.get_or_create(
             name=subscription.category,
-            defaults={'image': ''}
+            defaults={'image': f'/images/subscriptions/{subscription.category.lower().replace(" ", "-")}.jpg'}
         )
         product, _ = Product.objects.get_or_create(
             name=product_name,
@@ -87,7 +99,7 @@ def purchase_subscription(request):
             defaults={
                 'price': subscription.total_price,
                 'description': product_description,
-                'image': '',
+                'image': category.image,
             },
         )
 
