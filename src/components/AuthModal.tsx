@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { X } from "lucide-react";
 import { User } from "../types";
+import { apiUrl } from "../lib/api";
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -20,7 +21,7 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
     e.preventDefault();
     setError("");
     setLoading(true);
-    const endpoint = isLogin ? "/api/auth/login" : "/api/auth/signup";
+    const endpoint = isLogin ? apiUrl("/api/auth/login/") : apiUrl("/api/auth/signup/");
     
     try {
       const res = await fetch(endpoint, {
