@@ -10,6 +10,7 @@ import CartDrawer from "./components/CartDrawer";
 import ProfileModal from "./components/ProfileModal";
 import PaymentPage from "./pages/PaymentPage";
 import { Category, Product, Subscription, User, CartItem } from "./types";
+import { apiUrl } from "./lib/api";
 
 function MainApp() {
   const [user, setUser] = useState<User | null>(null);
@@ -50,15 +51,15 @@ function MainApp() {
     setLoading(true);
     try {
       const fetchCategories = async () => {
-        const res = await fetch("/api/categories");
+        const res = await fetch(apiUrl("/api/categories"));
         if (res.ok) setCategories(await res.json());
       };
       const fetchProducts = async () => {
-        const res = await fetch("/api/products");
+        const res = await fetch(apiUrl("/api/products"));
         if (res.ok) setProducts(await res.json());
       };
       const fetchSubscriptions = async () => {
-        const res = await fetch("/api/subscriptions");
+        const res = await fetch(apiUrl("/api/subscriptions"));
         if (res.ok) setSubscriptions(await res.json());
       };
 
@@ -115,7 +116,7 @@ function MainApp() {
 
     try {
       // Create pending order
-      const res = await fetch("/api/orders", {
+      const res = await fetch(apiUrl("/api/orders"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -146,7 +147,7 @@ function MainApp() {
     }
     try {
       // Create pending subscription order
-      const res = await fetch("/api/subscriptions/purchase", {
+      const res = await fetch(apiUrl("/api/subscriptions/purchase"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ user_id: user.id, subscription_id: sub.id }),
@@ -175,7 +176,7 @@ function MainApp() {
   };
 
   const filteredProducts = selectedCategory 
-    ? products.filter(p => p.category_id === selectedCategory.id)
+    ? products.filter(p => (p.category_id ?? p.category) === selectedCategory.id)
     : products;
 
   return (

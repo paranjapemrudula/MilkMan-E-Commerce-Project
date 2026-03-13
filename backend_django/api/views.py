@@ -3,7 +3,7 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate
-from .models import Category, Product, Subscription, Order, OrderItem
+from .models import Category, Product, Subscription, Order, OrderItem, Payment
 from .serializers import CategorySerializer, ProductSerializer, SubscriptionSerializer, OrderSerializer, UserSerializer
 
 class CategoryViewSet(viewsets.ReadOnlyModelViewSet):
@@ -62,6 +62,109 @@ def create_order(request):
                 price=item['price']
             )
         return Response({'id': order.id, 'message': 'Order placed successfully'})
+    except Exception as e:
+        return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['POST'])
+def purchase_subscription(request):
+    user_id = request.data.get('user_id')
+    subscription_id = request.data.get('subscription_id')
+
+    try:
+        user = User.objects.get(id=user_id)
+        subscription = Subscription.objects.get(id=subscription_id)
+
+        product_name = f"Subscription: {subscription.name} - {subscription.category}"
+        product_description = f"Plan for {subscription.duration_days} days @ Rs.{subscription.price_per_liter}/L"
+
+        category, _ = Category.objects.get_or_create(
+            name=subscription.category,
+            defaults={'image': ''}
+        )
+        product, _ = Product.objects.get_or_create(
+            name=product_name,
+            category=category,
+            defaults={
+                'price': subscription.total_price,
+                'description': product_description,
+                'image': '',
+            },
+        )
+
+        order = Order.objects.create(
+            user=user,
+            total_amount=subscription.total_price,
+            status='pending',
+        )
+        OrderItem.objects.create(
+            order=order,
+            product=product,
+            quantity=1,
+            price=subscription.total_price,
+        )
+
+        return Response({
+            'id': order.id,
+            'total_amount': order.total_amount,
+            'message': 'Subscription order created',
+        })
+    except (User.DoesNotExist, Subscription.DoesNotExist) as e:
+        return Response({'error': str(e)}, status=status.HTTP_404_NOT_FOUND)
+    except Exception as e:
+        return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['POST'])
+def create_payment_intent(request):
+    order_id = request.data.get('order_id')
+
+    try:
+        order = Order.objects.get(id=order_id)
+        if order.status != 'pending':
+            return Response({'error': 'Order not pending'}, status=status.HTTP_400_BAD_REQUEST)
+
+        payment = Payment.objects.create(
+            order=order,
+            amount=order.total_amount,
+            status=Payment.STATUS_PENDING,
+        )
+        return Response({
+            'payment_id': payment.id,
+            'amount': payment.amount,
+            'status': payment.status,
+        })
+    except Order.DoesNotExist:
+        return Response({'error': 'Order not found'}, status=status.HTTP_404_NOT_FOUND)
+    except Exception as e:
+        return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['POST'])
+def confirm_payment(request):
+    payment_id = request.data.get('payment_id')
+    outcome = request.data.get('outcome')
+
+    try:
+        payment = Payment.objects.get(id=payment_id)
+        if payment.status != Payment.STATUS_PENDING:
+            return Response({'error': 'Payment already processed'}, status=status.HTTP_400_BAD_REQUEST)
+
+        if outcome == 'success':
+            payment.status = Payment.STATUS_PAID
+            payment.order.status = 'paid'
+        elif outcome == 'cod':
+            payment.status = Payment.STATUS_COD
+            payment.order.status = 'pending'
+        else:
+            payment.status = Payment.STATUS_FAILED
+            payment.order.status = 'failed'
+
+        payment.save()
+        payment.order.save()
+
+        return Response({'status': payment.status})
+    except Payment.DoesNotExist:
+        return Response({'error': 'Payment not found'}, status=status.HTTP_404_NOT_FOUND)
     except Exception as e:
         return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
